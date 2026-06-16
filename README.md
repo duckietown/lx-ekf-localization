@@ -1,8 +1,10 @@
 <p align="center">
-<a href="https://duckietown.com"><img src="./assets/images/dtlogo.png" alt="Duckietown Logo" width="50%"></a>
+<a href="https://duckietown.com"><img src="./assets/images/dtlogo.png" alt="Logo and watermark of Duckietown, a robotics company" width="50%"></a>
 </p>
 
 # **Learning Experience (LX): Localization**
+
+
 
 Find the most up-to-date instructions on [how to run LXs on the Duckietown manual](https://docs.duckietown.com/ente/duckietown-manual/60-learning-experiences/lx-general-procedure.html). 
 
@@ -42,6 +44,7 @@ Update your exercise definition and instructions,
 ## 2. Make sure your system is up-to-date
 
 - 💻 This is an `ente` learning experience (note the branch name). Make sure your Duckietown Shell is set to an `ente` profile 
+
 - (and not, e.g., a `daffy` one). You can check your current distribution with
 
     dts profile list
@@ -73,7 +76,6 @@ If you have not done so already, set up your local SSL certificate needed to run
     sudo apt install libnss3-tools
     dts setup mkcert
 
-
 Open the code editor by running the following command,
 
 ```
@@ -84,7 +86,7 @@ Wait for a URL to appear on the terminal, then click on it or copy-paste it in t
 of your browser to access the code editor. The first thing you will see in the code editor is
 this same document, you can continue there.
 
-**NOTE**: if you are running Duckietown inside a devcontainer, make sure to [install the certificate for your host machine as well](https://docs.duckietown.com/ente/duckietown-manual/10-setup/setup-devcontainer.html#dts-code-run). 
+**NOTE**: if you are running Duckietown inside a devcontainer, make sure to [install the certificate for your host machine as well](https://docs.duckietown.com/ente/duckietown-manual/10-setup/00-computer/setup-duckietown-workspace.html#running-dts-code-editor). 
 
 
 ### Walkthrough of notebooks
