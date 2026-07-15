@@ -22,7 +22,7 @@ This learning experience is provided by the Duckietown team and can be run on Du
 [Duckietown Website](https://www.duckietown.com) for more learning materials, documentation, and demos.
 
 For guided setup instructions, lecture content, and more related to this LX, 
-see [our Self-Driving Cars with Duckietown MOOC on EdX](https://learning.edx.org/course/course-v1:ETHx+DT-01x+1T2025/home).
+see [our Self-Driving Cars with Duckietown MOOC on EdX](https://duckietown.com/self-driving-cars-with-duckietown-mooc/).
 
 **(If not already done) Clone this repository**
 
@@ -30,13 +30,12 @@ The recommended way to use this repository is to make a fork and then clone that
 
 This can be done through the GitHub web interface. However, you are also free to simply clone this repository and get started. 
 
-Example instructions to fork a repository and configure to pull from upstream can be found in the 
-[duckietown-lx repository README](https://github.com/duckietown/duckietown-lx/blob/mooc2022/README.md).
+Example instructions to fork a repository and configure to pull from upstream can be found in the [duckietown-lx repository README](https://github.com/duckietown/duckietown-lx/blob/mooc2022/README.md).
 
 
 ## 1. Make sure your LX is up-to-date
 
-Update your exercise definition and instructions,
+Update your LX definition and instructions,
 
     git remote add upstream git@github.com:duckietown/lx-ekf-localization
     git pull upstream ente
@@ -136,44 +135,41 @@ You should see the Unity-based Duckiematrix simulator start up. The startup scre
 
 Your Duckiebot is at the start of a long straightaway with duckies crossing the road. 
 
-From here you can click anywhere on the window and click [ENTER] to make it become active. 
-From here you can move the duckie towards the Duckiebot with the 'w', 'a', 's', and 'd' keys or you can move the 
-camera angle to view the Duckiebot with the mouse. If you are close enough to your Duckiebot, you can jump on with the 'E' key, 
-which should look like
+Remember that to activate the Duckiematrix window, click anywhere on it and press [ENTER]. You can then at any time press `ESC` to disengage the mouse. 
+
+From here you can move the duckie towards the Duckiebot with the 'w', 'a', 's', and 'd' keys, or you can move the camera angle to view the Duckiebot with the mouse. If you are close enough to your Duckiebot, you can jump on with the 'E' key. You can then drive the Duckiebot around with the 'w', 'a', 's', and 'd' keys. All available keyboard commands are summarized in the "Settings" tab at the bottom left of the Duckiematrix window. 
 
 ![duckiematrix_riding](assets/images/duckiematrix-riding.png)
 
 You can then drive the Duckiebot around with the 'w', 'a', 's', and 'd' keys. You'll notice that this map includes traffic signs with fiducial 
 markers ([AprilTags](https://april.eecs.umich.edu/software/apriltag)) that we are going to use in this exercise to help localize your robot. 
 
-If you get very lost from the road and you want to come back, you can do so with the 'R' key (note that 
-you should do this for the exercise before testing every time since the initial state estimate coincides
+If you get very lost from the road and you want to come back, you can do so with the 'R' key (note that you should do this for the exercise before testing every time since the initial state estimate coincides
 with the reset position). 
-
 
 ### Building your code
 
-You can build your code with 
+After going through the notebooks, at any time you can compile your code in a Docker image with:
 
 ```
 dts code build -R ROBOT_NAME 
 ```
 
-This will build a docker image with your code compiled inside.
-
-
 ### 💻 Testing 
 
-
-To test your code by running:
+Test your code on the virtual Duckiebot in the Duckiematrix:
 
 ```
-dts code workbench [-m] -R ROBOT_NAME 
+dts code workbench -m -R [VIRTUAL_ROBOT_NAME]
 ```
 
-You should include the `-m` if `ROBOT_NAME` is a virtual robot to indicate that you are running in the Duckiematrix.
+To test it on a physical Duckiebot instead:
 
-In another terminal, you can launch the `noVNC` viewer for this exercise and open RViz. 
+```
+dts code workbench -R [ROBOT_NAME]
+```
+
+In another terminal, you can launch the `noVNC` viewer for this LX and open RViz. 
 
 ```
 dts code vnc -R [ROBOT_NAME]
