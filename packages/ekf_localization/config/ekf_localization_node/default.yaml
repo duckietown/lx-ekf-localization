@@ -1,21 +1,36 @@
-no_predict: False
-no_update: False
+/**:
+  ros__parameters:
+    # debugging switches: skip the prediction (encoders) or the update (AprilTags) step
+    no_predict: false
+    no_update: false
 
-test_sim: False
+    # use the exact range/bearing computed from the Duckiematrix ground truth instead of the camera
+    test_sim: false
 
-# this is the initial pose of the duckiebot in the Duckiematrix
-# For real robot experiment you may need to update
-x_0: 0.41
-y_0: 0.61
-theta_0: 1.57
+    # this is the initial pose of the duckiebot in the Duckiematrix
+    # For real robot experiment you may need to update
+    x_0: 0.41
+    y_0: 0.61
+    theta_0: 1.57
 
-P_0_xx: 0.1
-P_0_yy: 0.1
-P_0_tt: 0.01
+    # initial state covariance (diagonal)
+    P_0_xx: 0.1
+    P_0_yy: 0.1
+    P_0_tt: 0.01
 
-Q_xx: 0.2
-Q_tt: 0.1
+    # process noise covariance (diagonal): forward displacement, rotation
+    Q_xx: 0.2
+    Q_tt: 0.1
 
-R_rr: 0.2
-R_tt: 0.05
+    # measurement noise covariance (diagonal): range, bearing
+    R_rr: 0.2
+    R_tt: 0.05
 
+    # AprilTag size in meters (Duckietown traffic signs)
+    tag_size: 0.065
+
+    # rate of the prediction step [Hz]
+    predict_rate: 10.0
+
+    # landmark map (set by the launch file to <share>/ekf_localization/map.yaml when empty)
+    map_file: ""

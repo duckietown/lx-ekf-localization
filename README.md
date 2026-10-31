@@ -63,6 +63,11 @@ Update your LX definition and instructions,
 
     dts duckiebot virtual restart ROBOTNAME
 
+- 🚙 This LX runs on ROS 2. Bring the ROS 2 stack of the robot up (real or virtual; the virtual robot still autoboots the ROS 1 stack, so the ROS 2 stack is started explicitly for now):
+
+    dts stack up -R ROBOTNAME ros2/duckiebot
+    dts stack up -R ROBOTNAME ros2-core/default
+
 
 ## 3. Work on the exercise
 
@@ -122,6 +127,13 @@ You should see it with a status `Booting` and finally `Ready` if you look at `dt
 [VBOT] |  virtual | duckiebot | DB21J |  Ready   | [VBOT].local
 ```
 
+Then start the ROS 2 stack on the virtual robot:
+
+```
+dts stack up -R VBOT ros2/duckiebot
+dts stack up -R VBOT ros2-core/default
+```
+
 Now that your virtual robot is ready, you can start the Duckiematrix. From a terminal in this exercise directory that you 
 cloned do:
 
@@ -169,28 +181,18 @@ To test it on a physical Duckiebot instead:
 dts code workbench -R [ROBOT_NAME]
 ```
 
-In another terminal, you can launch the `noVNC` viewer for this LX and open RViz. 
+This runs the `ekf_localization_node` on the robot (`[ROBOT_NAME]` is the real or the virtual robot, use whichever you ran the `dts code build` command with). 
+The node publishes your pose estimate with its covariance on `/ROBOT_NAME/ekf_localization_node/pose` (`nav_msgs/Odometry`), the landmarks of the map on `/ROBOT_NAME/map_markers` (`visualization_msgs/MarkerArray`, green markers that turn blue while the corresponding AprilTag is detected) and the camera image with the detected tags on `/ROBOT_NAME/ekf_localization_node/debug/detections/compressed`.
 
-```
-dts code vnc -R [ROBOT_NAME]
-```
+The visualization lives in the [EKF notebook](./notebooks/04-ekf-localization/ekf_localization.ipynb): its last cells connect to the robot (`RosSession(ROBOT)`) and show, live inside the code editor, the trajectory of your estimate with its covariance ellipse (purple) and the landmarks, the detections image, a panel to change the filter parameters (noise covariances, initial pose, `no_predict`/`no_update`) while the node runs, and a `reset` button that re-initialises the filter. In the Duckiematrix the ground truth pose (`/ROBOT_NAME/duckiematrix_interface_node/state`) can be plotted as well: it should stay inside the covariance ellipse if your implementation is correct.
 
-where `[ROBOT_NAME]` could be the real or the virtual robot (use whichever you ran the `dts code workbench` and `dts code build` command with).
-
-This will show you your published pose estimate (blue arrow with a covariance ellipse in purple) as well as the ground truth pose of the robot (red arrow which should be inside the ellipse if your implementation is correct). 
-You will also see markers that correspond to the 
-AprilTag traffic signs in the map. As each one is detected by your camera you will see it change
-color from green to blue. At initialization, it should look like this:
-
-![rviz](assets/images/rviz.png)
-
-You can also look at an image that shows the tags that are being detected. It is published on the topic `/ROBOT_NAME/detections/image/compressed` (for example you can view with `rqt_image_viewer`).
-
-This output should look like this:
+The detections image should look like this:
 
 ![apriltag-detections](assets/images/apriltag-detections.png)
 
-You may also use the joystick to pilot your robot and test that the localization performance
+A terminal inside the code editor is already connected to the robot (set `ROBOT` in the notebook, or export `VEHICLE_NAME`), so you can also inspect everything from the command line: `ros2 topic list`, `ros2 topic echo /ROBOT_NAME/ekf_localization_node/pose`, `ros2 node list`, `ros2 param list /ROBOT_NAME/ekf_localization_node`, `ros2 param set /ROBOT_NAME/ekf_localization_node no_update true`, `ros2 service call /ROBOT_NAME/ekf_localization_node/reset std_srvs/srv/Trigger`.
+
+You may also use the keyboard (`dts duckiebot keyboard_control ROBOT_NAME`, or the Duckiematrix window) to pilot your robot and test the localization performance
 of your Duckiebot as it moves.
 
 Now you can proceed to the [first notebook](./notebooks/01-kalman-filter/kalman-filter.ipynb).
