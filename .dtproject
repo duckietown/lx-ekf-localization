@@ -10,7 +10,7 @@ NAME=lx-ekf-localization
 RECIPE_REPOSITORY=duckietown/lx-recipe-ekf-localization
 
 # - branch of RECIPE_REPOSITORY containing the recipe
-RECIPE_BRANCH=ente-ros2
+RECIPE_BRANCH=DTSW-8520-convert-lx-ekf-localization-to-ros2
 
 # - location of the recipe inside the RECIPE_REPOSITORY/RECIPE_BRANCH above
 RECIPE_LOCATION=
