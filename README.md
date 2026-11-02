@@ -67,8 +67,8 @@ Update your LX definition and instructions,
 
 - 🚙 This LX runs on ROS 2. Bring the ROS 2 stack of the robot up (real or virtual; the virtual robot still autoboots the ROS 1 stack, so the ROS 2 stack is started explicitly for now):
 
-    dts stack up -R ROBOTNAME ros2/duckiebot
-    dts stack up -R ROBOTNAME ros2-core/default
+    dts stack up -H ROBOTNAME ros2/duckiebot
+    dts stack up -H ROBOTNAME ros2-core/default
 
 
 ## 3. Work on the exercise
@@ -132,8 +132,8 @@ You should see it with a status `Booting` and finally `Ready` if you look at `dt
 Then start the ROS 2 stack on the virtual robot:
 
 ```
-dts stack up -R VBOT ros2/duckiebot
-dts stack up -R VBOT ros2-core/default
+dts stack up -H VBOT ros2/duckiebot
+dts stack up -H VBOT ros2-core/default
 ```
 
 Now that your virtual robot is ready, you can start the Duckiematrix. From a terminal in this exercise directory that you 
