@@ -3,12 +3,13 @@
     <arg name="param_file_name" default="default" doc="Specify a param file. ex:megaman." />
     <arg name="node_name" default="ekf_localization_node" doc="name of the node"/>
     <arg name="veh" doc="Name of vehicle. ex: megaman"/>
+    <arg name="map_name" default="map" doc="landmark map file (without .yaml) in the ekf_localization package. ex: aa3341"/>
 
     <group ns="$(arg veh)">
         <node pkg="$(arg pkg_name)" type="$(arg node_name).py" name="$(arg node_name)" output="screen"
               required="true">
               <rosparam command="load" file="$(find ekf_localization)/config/$(arg node_name)/$(arg param_file_name).yaml"/>
-              <rosparam command="load" file="$(find ekf_localization)/map.yaml"/>
+              <rosparam command="load" file="$(find ekf_localization)/$(arg map_name).yaml"/>
 
         </node>
     </group>
