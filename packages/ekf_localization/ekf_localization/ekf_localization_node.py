@@ -15,7 +15,8 @@ Services:
     ~/reset (std_srvs/Trigger): re-initialise the filter from the ``x_0, y_0, theta_0, P_0_*`` parameters
 Parameters (live, see ``config/ekf_localization_node/default.yaml``):
     no_predict, no_update, test_sim, x_0, y_0, theta_0, P_0_xx, P_0_yy, P_0_tt, Q_xx, Q_tt, R_rr, R_tt,
-    tag_size, predict_rate, map_file
+    tag_size, predict_rate, update_rate, detector_nthreads, detector_quad_decimate, detector_quad_sigma, map_file
+    (predict_rate, update_rate, detector_* and map_file are read at start-up)
 """
 import os
 from typing import Dict, Optional
@@ -85,6 +86,10 @@ class EKFLocalizationNode(Node):
             "R_tt": 0.0,
             "tag_size": 0.065,
             "predict_rate": 10.0,
+            "update_rate": 2.0,
+            "detector_nthreads": 4,
+            "detector_quad_decimate": 1.0,
+            "detector_quad_sigma": 0.8,
             "map_file": "",
         }, on_change=self._on_param)
 
@@ -115,11 +120,13 @@ class EKFLocalizationNode(Node):
             raise RuntimeError("No map provided")
         self.get_logger().info(f"Loaded {len(self.map)} landmarks from {map_file}")
 
+        # AprilTag detector (settings read at start-up): full resolution quad detection (quad_decimate 1.0)
+        # with a light Gaussian blur (quad_sigma) finds smaller / more distant tags, at a higher CPU cost
         self.apriltag_detector = Detector(
             families="tag36h11",
-            nthreads=1,
-            quad_decimate=2.0,
-            quad_sigma=0.0,
+            nthreads=int(self.params.detector_nthreads),
+            quad_decimate=float(self.params.detector_quad_decimate),
+            quad_sigma=float(self.params.detector_quad_sigma),
             refine_edges=1,
             decode_sharpening=0.25
         )
@@ -149,6 +156,8 @@ class EKFLocalizationNode(Node):
         # we will do prediction at a fixed frequency rather than asynchronously
         # when the encoder data arrives
         self.create_timer(1.0 / max(float(self.params.predict_rate), 0.1), self.doPredict)
+        # the update step (AprilTag detection) runs at its own fixed rate, also when the robot is not moving
+        self.create_timer(1.0 / max(float(self.params.update_rate), 0.1), self.doUpdate)
         # keep late subscribers (notebook plots) informed even when the robot does not move
         self.create_timer(1.0, self.doHeartbeat)
 
@@ -275,7 +284,7 @@ class EKFLocalizationNode(Node):
             self.ekf.predict(dX, dT)
         self.delta_phi_left = 0
         self.delta_phi_right = 0
-        self.doUpdate()
+        self.publish_pose()
 
     def doHeartbeat(self):
         # the pose and the map are re-published once per second so that notebook plots
@@ -342,12 +351,16 @@ class EKFLocalizationNode(Node):
         tag_size = float(self.params.tag_size)
 
         # Detect AprilTags with pose estimation
-        detections = self.apriltag_detector.detect(
-            image_gray,
-            estimate_tag_pose=True,
-            camera_params=camera_params,
-            tag_size=tag_size
-        )
+        try:
+            detections = self.apriltag_detector.detect(
+                image_gray,
+                estimate_tag_pose=True,
+                camera_params=camera_params,
+                tag_size=tag_size
+            )
+        except Exception as e:
+            self.get_logger().warn(f"AprilTag detection failed: {e}", throttle_duration_sec=5.0)
+            return
 
         # Process each detection
         for detection in detections:

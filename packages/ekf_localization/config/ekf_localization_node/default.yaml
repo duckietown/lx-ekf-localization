@@ -32,5 +32,14 @@
     # rate of the prediction step [Hz]
     predict_rate: 10.0
 
-    # landmark map (set by the launch file to <share>/ekf_localization/map.yaml when empty)
+    # rate of the update step (AprilTag detection) [Hz]; it also runs while the robot stands still
+    update_rate: 2.0
+
+    # AprilTag detector settings (read at start-up): number of threads, quad decimation (1.0 = quad detection
+    # on the full-resolution image) and sigma [px] of the Gaussian blur applied before quad detection
+    detector_nthreads: 4
+    detector_quad_decimate: 1.0
+    detector_quad_sigma: 0.8
+
+    # landmark map (the launch file sets it to <share>/ekf_localization/<map_name>.yaml, map_name defaults to map)
     map_file: ""
