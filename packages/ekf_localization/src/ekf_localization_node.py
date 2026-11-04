@@ -101,9 +101,9 @@ class EKFLocalizationNode(DTROS):
 
         self.apriltag_detector = Detector(
             families="tag36h11",
-            nthreads=1,
-            quad_decimate=2.0,
-            quad_sigma=0.0,
+            nthreads=4,
+            quad_decimate=1.0,
+            quad_sigma=0.8,
             refine_edges=1,
             decode_sharpening=0.25
         )
@@ -174,7 +174,8 @@ class EKFLocalizationNode(DTROS):
         # we will do prediction at a fixed frequency rather than asynchronously
         # when the encoder data arrives
         rospy.Timer(rospy.Duration(1.0/10.0), self.doPredict)
-
+        # the update step (AprilTag detection) runs at its own fixed rate, also when the robot is not moving
+        rospy.Timer(rospy.Duration(1.0/2.0), self.doUpdate)
 
         self.loginfo("Initialized!")
 
@@ -232,6 +233,8 @@ class EKFLocalizationNode(DTROS):
 
     def doPredict(self, event=None):
 
+        if self.no_predict:
+            return
 
         if self.delta_phi_right == 0 and self.delta_phi_left ==0:
             # we haven't moved no need to predict
@@ -251,7 +254,8 @@ class EKFLocalizationNode(DTROS):
                 self.ekf.predict(dX, dT)
                 self.delta_phi_left = 0
                 self.delta_phi_right = 0
-                self.doUpdate()
+
+        self.publish_pose()
 
 
     def cb_info(self, msg):
@@ -279,13 +283,9 @@ class EKFLocalizationNode(DTROS):
     def cb_image(self, image_msg):
         self.latest_img = image_msg
 
-    def doUpdate(self):
-
+    def doUpdate(self, event=None):
         """
-
-        Args:
-            image_msg (:obj:`sensor_msgs.msg.CompressedImage`): The received image message
-
+        Correct the estimate with the AprilTags visible in the latest camera image.
         """
         if self.no_update:
             return
@@ -317,12 +317,16 @@ class EKFLocalizationNode(DTROS):
         tag_size = 0.065
         
         # Detect AprilTags with pose estimation
-        detections = self.apriltag_detector.detect(
-            image_gray,
-            estimate_tag_pose=True,
-            camera_params=camera_params,
-            tag_size=tag_size
-        )
+        try:
+            detections = self.apriltag_detector.detect(
+                image_gray,
+                estimate_tag_pose=True,
+                camera_params=camera_params,
+                tag_size=tag_size
+            )
+        except Exception as e:
+            self.logwarn(f"AprilTag detection failed: {e}")
+            return
         
         # Process each detection
         for detection in detections:
@@ -335,16 +339,6 @@ class EKFLocalizationNode(DTROS):
             # Get the tag position from the map
             tag_position = self.map[tag_id]
             tag_x, tag_y = tag_position[0], tag_position[1]
-
-            # let's calculate the exact range and bearing using the GT pose and
-            # tag location
-            if self.gt_pose is None:
-                return
-            dx = tag_x - self.gt_pose[0]
-            dy = tag_y - self.gt_pose[1]
-            sim_range_estimate = np.linalg.norm([dx, dy])
-            sim_bearing = np.arctan2(dy, dx) - self.gt_pose[2]
-            sim_bearing = wrap_angle(sim_bearing)
 
             # Get pose from detection (translation vector in camera frame)
             # pose_t is a 3x1 matrix: [x, y, z] where z is forward, x is right, y is down
@@ -360,8 +354,14 @@ class EKFLocalizationNode(DTROS):
             bearing=wrap_angle(bearing)
 
             if self.sim:
-                range_estimate = sim_range_estimate
-                bearing = sim_bearing
+                # let's calculate the exact range and bearing using the GT pose and
+                # tag location (Duckiematrix only)
+                if self.gt_pose is None:
+                    continue
+                dx = tag_x - self.gt_pose[0]
+                dy = tag_y - self.gt_pose[1]
+                range_estimate = np.linalg.norm([dx, dy])
+                bearing = wrap_angle(np.arctan2(dy, dx) - self.gt_pose[2])
 
             # Update the EKF with this measurement
             self.ekf.update([range_estimate, bearing], [tag_x, tag_y])

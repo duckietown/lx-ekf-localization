@@ -51,13 +51,15 @@ Update your LX definition and instructions,
   To switch to an ente profile, follow the [Duckietown Manual DTS installation instructions](https://docs.duckietown.com/ente/duckietown-manual/10-setup/02-software/duckietown-shell-dts-installation.html#dt-account-switch-profile).
 
 
-- 💻 Always make sure your Duckietown Shell is updated to the latest version. See [installation instructions](https://github.com/duckietown/duckietown-shell)
+- 💻 Always make sure your Duckietown Shell is updated to the latest version: `pipx upgrade duckietown-shell` (see [installation instructions](https://github.com/duckietown/duckietown-shell))
 
 - 💻 Update the shell commands: `dts update`
 
 - 💻 Update your laptop/desktop: `dts desktop update`
 
 - 🚙 Update your Duckiebot: `dts duckiebot update ROBOTNAME` (where `ROBOTNAME` is the name of your Duckiebot - real or virtual.)
+
+- 🚙 If you use a real Duckiebot, make sure its camera is calibrated (intrinsic and extrinsic calibration): every camera is slightly different and mounted slightly differently, and the AprilTag range and bearing measurements used by the EKF are computed with the intrinsic calibration. Follow the [camera calibration instructions](https://docs.duckietown.com/ente/duckietown-manual/20-operations/04-calibrations/duckiebot-camera-calibration.html).
 
 **Note**: if your virtual robot hangs indefinitely when you try to update it, you can try to restart it with:
 
@@ -100,7 +102,7 @@ Follow the instructions on the notebook and work through the notebooks in sequen
 
 ### Testing with the Duckiematrix
 
-To test your code in the Duckiematrix you will need a virtual robot. You can create one with the command:
+It can be useful to test your code in simulation before trying it on the real robot. To test your code in the Duckiematrix you will need a virtual robot. You can create one with the command:
 
 ```
 dts duckiebot virtual create --type duckiebot --configuration DB21J VBOT
@@ -144,6 +146,10 @@ From here you can move the duckie towards the Duckiebot with the 'w', 'a', 's', 
 You can then drive the Duckiebot around with the 'w', 'a', 's', and 'd' keys. You'll notice that this map includes traffic signs with fiducial 
 markers ([AprilTags](https://april.eecs.umich.edu/software/apriltag)) that we are going to use in this exercise to help localize your robot. 
 
+You can also switch to a top-down view of the map by pressing the 'v' key, which gives a view similar to this one:
+
+![duckiematrix_overhead](assets/images/duckiematrix-overhead.png)
+
 If you get very lost from the road and you want to come back, you can do so with the 'R' key (note that you should do this for the exercise before testing every time since the initial state estimate coincides
 with the reset position). 
 
@@ -154,6 +160,8 @@ After going through the notebooks, at any time you can compile your code in a Do
 ```
 dts code build -R ROBOT_NAME 
 ```
+
+where `ROBOT_NAME` is the name of your real or virtual robot.
 
 ### 💻 Testing 
 
@@ -169,7 +177,7 @@ To test it on a physical Duckiebot instead:
 dts code workbench -R [ROBOT_NAME]
 ```
 
-In another terminal, you can launch the `noVNC` viewer for this LX and open RViz. 
+In another terminal, you can launch the `noVNC` viewer for this LX and open RViz, which is useful to send commands to the robot (joystick) and to visualize your estimate. 
 
 ```
 dts code vnc -R [ROBOT_NAME]
@@ -190,7 +198,7 @@ This output should look like this:
 
 ![apriltag-detections](assets/images/apriltag-detections.png)
 
-You may also use the joystick to pilot your robot and test that the localization performance
+You should now use the joystick to pilot your robot and test the localization performance
 of your Duckiebot as it moves.
 
 Now you can proceed to the [first notebook](./notebooks/01-kalman-filter/kalman-filter.ipynb).
