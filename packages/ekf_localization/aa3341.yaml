@@ -1,0 +1,26 @@
+# Example of a measured real-room map (UdeM AA-3341 lab, IFT3345 course): to use it, pass the launch argument map_name:=aa3341 (or change its default in launch/ekf_localization_node.launch.py)
+map:
+  "41":
+    position: [-0.029, 0.29]
+  "106":
+    position: [-0.029, 0.82]
+  "20":
+    position: [-0.02925, 1.99]
+  "44":
+    position: [0.165 , 2.42]
+  "24":
+    position: [0.8, 2.42]
+  "61":
+    position: [1.46, 2.42]
+  "33":
+    position: [2.01 , 2.42]
+  "95":
+    position: [0.61 , -0.03]
+  "103":
+    position: [1.5, -0.03]
+  "110":
+    position: [2.4, 0.25]
+  "70":
+    position: [2.4, 0.61 ]
+  "47":
+    position: [2.4, 1.21]

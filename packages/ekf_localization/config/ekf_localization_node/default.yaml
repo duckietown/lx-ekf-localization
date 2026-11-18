@@ -1,21 +1,45 @@
-no_predict: False
-no_update: False
+/**:
+  ros__parameters:
+    # debugging switches: skip the prediction (encoders) or the update (AprilTags) step
+    no_predict: false
+    no_update: false
 
-test_sim: False
+    # use the exact range/bearing computed from the Duckiematrix ground truth instead of the camera
+    test_sim: false
 
-# this is the initial pose of the duckiebot in the Duckiematrix
-# For real robot experiment you may need to update
-x_0: 0.41
-y_0: 0.61
-theta_0: 1.57
+    # this is the initial pose of the duckiebot in the Duckiematrix
+    # For real robot experiment you may need to update
+    x_0: 0.41
+    y_0: 0.61
+    theta_0: 1.57
 
-P_0_xx: 0.1
-P_0_yy: 0.1
-P_0_tt: 0.01
+    # initial state covariance (diagonal)
+    P_0_xx: 0.1
+    P_0_yy: 0.1
+    P_0_tt: 0.01
 
-Q_xx: 0.2
-Q_tt: 0.1
+    # process noise covariance (diagonal): forward displacement, rotation
+    Q_xx: 0.2
+    Q_tt: 0.1
 
-R_rr: 0.2
-R_tt: 0.05
+    # measurement noise covariance (diagonal): range, bearing
+    R_rr: 0.2
+    R_tt: 0.05
 
+    # AprilTag size in meters (Duckietown traffic signs)
+    tag_size: 0.065
+
+    # rate of the prediction step [Hz]
+    predict_rate: 10.0
+
+    # rate of the update step (AprilTag detection) [Hz]; it also runs while the robot stands still
+    update_rate: 2.0
+
+    # AprilTag detector settings (read at start-up): number of threads, quad decimation (1.0 = quad detection
+    # on the full-resolution image) and sigma [px] of the Gaussian blur applied before quad detection
+    detector_nthreads: 4
+    detector_quad_decimate: 1.0
+    detector_quad_sigma: 0.8
+
+    # landmark map (the launch file sets it to <share>/ekf_localization/<map_name>.yaml, map_name defaults to map)
+    map_file: ""
